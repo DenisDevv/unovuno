@@ -1,0 +1,48 @@
+/* styles.css */
+body {
+  margin: 0;
+  overflow: hidden;
+  background-color: #000;
+  font-family: Arial, sans-serif;
+  color: white;
+}
+
+#lobbyUI {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+#matchButton {
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+#status {
+  margin-top: 20px;
+}
+
+#gameCanvas {
+  display: none;
+  width: 1920px;
+  height: 1080px;
+}
+
+#fullscreenWarning {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.85);
+  color: white;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 20px;
+  box-sizing: border-box;
+}

@@ -1,0 +1,22 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>2D Shooter Game</title>
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+<div id="lobbyUI">
+  <h1>Welcome to 2D Shooter</h1>
+  <button id="matchButton">Find Match</button>
+  <p id="status">Click "Find Match" to start.</p>
+</div>
+<div id="fullscreenWarning">
+  <h2>Please play in fullscreen mode (1920x1080).</h2>
+</div>
+<canvas id="gameCanvas" style="display:none;"></canvas>
+<script src="/socket.io/socket.io.js"></script>
+<script src="./js/app.js"></script>
+</body>
+</html>
