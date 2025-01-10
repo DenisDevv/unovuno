@@ -18,14 +18,14 @@ const player = {
   y: 0,
   radius: 20,
   color: 'blue',
-  speed: 5,
+  speed: 10,
   dx: 0,
   dy: 0,
-  health: 100,
-  magazineSize: 12,
-  bullets: 12,
+  health: 120,
+  magazineSize: 6,
+  bullets: 0,
   isReloading: false,
-  reloadTime: 2000,
+  reloadTime: 2500,
 };
 
 // Opponent object
@@ -35,7 +35,7 @@ const opponent = {
   y: 0,
   radius: 20,
   color: 'red',
-  health: 100,
+  health: 120,
 };
 
 // Bullets array
@@ -84,18 +84,21 @@ window.addEventListener('keyup', (e) => {
 
 // Join matchmaking lobby
 matchButton.addEventListener('click', () => {
+  checkFullscreen();
   socket.emit('joinLobby');
   lobbyUI.style.display = 'none';
 });
-
 // Handle Fullscreen Requirement
 function checkFullscreen() {
-  if (window.innerWidth < 1920 || window.innerHeight < 1080) {
-    pauseGame();
-    fullscreenWarning.style.display = 'flex';
+  if (document.fullscreenEnabled && !document.fullscreenElement) {
+    document.documentElement.requestFullscreen().then(r => {
+      console.log('Fullscreen enabled');
+    });
+    //pauseGame();
+    //fullscreenWarning.style.display = 'flex';
   } else {
-    resumeGame();
-    fullscreenWarning.style.display = 'none';
+    //resumeGame();
+    //fullscreenWarning.style.display = 'none';
   }
 }
 
@@ -286,7 +289,6 @@ socket.on('playerHit', (data) => {
   // Check if the hit was on this player
   player.health -= data.damage;
   if (player.health <= 0) {
-    alert('You Lose!');
     resetGame();
     window.location.href = '/gameover';
   }
@@ -309,11 +311,9 @@ socket.on('spawn', (data) => {
 // Handle game over
 socket.on('gameOver', (data) => {
   if (data.result === 'win') {
-    alert('You Win!');
-    window.location.href = '/gameover';
+    window.location.href = '/gameover/won';
   } else if (data.result === 'lose') {
-    alert('You Lose!');
-    window.location.href = '/gameover';
+    window.location.href = '/gameover/lost';
   }
   resetGame();
 });
@@ -324,7 +324,17 @@ function drawOpponent() {
     drawPlayer(opponent);
   }
 }
+let ping = 0;
+let startTime = 0;
+socket.on('pong', () => {
+  ping = Date.now() - startTime;
+});
+function sendPing() {
+  startTime = Date.now();
+  socket.emit('ping');
+}
 
+setInterval(sendPing, 1000);
 // Health HUD and Ammo HUD
 function drawHUD() {
   ctx.fillStyle = 'white';
@@ -337,6 +347,7 @@ function drawHUD() {
   if (opponent.id) {
     ctx.fillText(`Opponent Health: ${opponent.health}`, 20, 120);
   }
+  ctx.fillText(`Ping: ${ping} ms`, 20, 150);
 }
 
 // Reset game
@@ -365,6 +376,8 @@ function update() {
 
 // Start the game when a match is found
 socket.on('matchFound', (data) => {
+  document.getElementById("matchmakingStatus").innerHTML = "In coda 2/2..."
+
   console.log('Match found with:', data.opponent);
   opponent.id = data.opponent;
   socket.emit('spawn');
@@ -372,5 +385,6 @@ socket.on('matchFound', (data) => {
 
 // Handle waiting state
 socket.on('waiting', () => {
+  document.getElementById("matchmakingStatus").innerHTML = "In coda 1/2..."
   console.log('Waiting for an opponent...');
 });

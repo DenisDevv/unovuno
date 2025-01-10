@@ -31,7 +31,7 @@ body {
   height: 1080px;
 }
 
-#fullscreenWarning {
+#fullscreenWarning{
   position: absolute;
   top: 0;
   left: 0;
@@ -46,3 +46,4 @@ body {
   padding: 20px;
   box-sizing: border-box;
 }
+

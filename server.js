@@ -33,8 +33,8 @@ io.on('connection', (socket) => {
       const spawn2 = spawnPoints[1];
 
       // Initialize player states
-      players[player1] = { health: 100, opponent: player2 };
-      players[player2] = { health: 100, opponent: player1 };
+      players[player1] = { health: 120, opponent: player2 };
+      players[player2] = { health: 120, opponent: player1 };
 
       // Notify both players
       io.to(player1).emit('matchFound', { opponent: player2 });
@@ -87,8 +87,8 @@ io.on('connection', (socket) => {
         io.to(socket.id).emit('gameOver', { result: 'win' });
         io.to(opponentId).emit('gameOver', { result: 'lose' });
         // Reset player states
-        players[socket.id].health = 100;
-        players[opponentId].health = 100;
+        players[socket.id].health = 120;
+        players[opponentId].health = 120;
       }
     }
   });
@@ -96,11 +96,13 @@ io.on('connection', (socket) => {
   // Handle reset
   socket.on('playerReset', () => {
     if (players[socket.id]) {
-      players[socket.id].health = 100;
+      players[socket.id].health = 120;
       io.to(socket.id).emit('resetConfirmed');
     }
   });
-
+  socket.on('ping', () => {
+    socket.emit('pong');
+  });
   socket.on('disconnect', () => {
     console.log('Player disconnected:', socket.id);
     // Remove from lobby if present
@@ -110,16 +112,19 @@ io.on('connection', (socket) => {
     if (opponentId) {
       io.to(opponentId).emit('opponentDisconnected');
       // Reset opponent's health
-      players[opponentId].health = 100;
+      players[opponentId].health = 120;
       // Remove opponent's reference
       delete players[opponentId].opponent;
     }
     delete players[socket.id];
   });
 });
-app.get("/gameover", (req, res) => {
-  res.sendFile(__dirname + "/gameover.html");
+app.get("/gameover/won", (req, res) => {
+  res.sendFile(__dirname + "/won.html");
 });
-server.listen(3000, () => {
+app.get("/gameover/lost", (req, res) => {
+  res.sendFile(__dirname + "/lost.html");
+});
+server.listen(3000, '0.0.0.0', () => {
   console.log('Server is running on port 3000');
 });
