@@ -3,18 +3,16 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>2D Shooter Game</title>
+  <title>Uno vs Uno</title>
   <link rel="stylesheet" href="./css/style.css">
 </head>
 <body>
 <div id="lobbyUI">
-  <h1>Welcome to 2D Shooter</h1>
-  <button id="matchButton">Find Match</button>
-  <p id="status">Click "Find Match" to start.</p>
+  <h1>Uno vs Uno</h1>
+  <button id="matchButton">Cerca Partita</button>
+  <p id="status">Premi "Cerca Partita" per iniziare.</p>
 </div>
-<div id="fullscreenWarning">
-  <h2>Please play in fullscreen mode (1920x1080).</h2>
-</div>
+<h1 id="matchmakingStatus" style="display: none"></h1>
 <canvas id="gameCanvas" style="display:none;">
 </canvas>
 <script src="/socket.io/socket.io.js"></script>

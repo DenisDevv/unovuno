@@ -3,7 +3,6 @@ const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const lobbyUI = document.getElementById('lobbyUI');
 const matchButton = document.getElementById('matchButton');
-const fullscreenWarning = document.getElementById('fullscreenWarning');
 
 canvas.width = 1920;
 canvas.height = 1080;
@@ -89,6 +88,7 @@ window.addEventListener('keyup', (e) => {
 matchButton.addEventListener('click', () => {
   checkFullscreen();
   socket.emit('joinLobby');
+  document.getElementById("matchmakingStatus").style.display = 'block';
   lobbyUI.style.display = 'none';
 });
 function checkFullscreen() {
@@ -162,7 +162,7 @@ window.addEventListener('mousedown', (e) => {
       radius: 5,
       color: 'yellow',
       angle: angle,
-      speed: 10,
+      speed: 50,
       owner: socket.id,
     };
     bullets.push(bullet);
@@ -310,10 +310,10 @@ setInterval(sendPing, 1000);
 function drawHUD() {
   ctx.fillStyle = 'white';
   ctx.font = '20px Arial';
-  ctx.fillText(`Health: ${player.health}`, 20, 30);
-  ctx.fillText(`Bullets: ${player.bullets}/${player.magazineSize}`, 20, 60);
+  ctx.fillText(`Vita: ${player.health}`, 20, 30);
+  ctx.fillText(`Colpi: ${player.bullets}/${player.magazineSize}`, 20, 60);
   if (player.isReloading) {
-    ctx.fillText(`Reloading...`, 20, 90);
+    ctx.fillText(`Ricaricando..`, 20, 90);
   }
   if (opponent.id) {
     ctx.fillText(`Opponent Health: ${opponent.health}`, 20, 120);
@@ -323,10 +323,10 @@ function drawHUD() {
 
 // Reset game
 function resetGame() {
-  player.health = 100;
+  player.health = 120;
   player.bullets = player.magazineSize;
   player.isReloading = false;
-  opponent.health = 100;
+  opponent.health = 120;
   bullets.length = 0;
   socket.emit('playerReset');
 }
@@ -344,17 +344,14 @@ function update() {
   drawHUD();
   requestAnimationFrame(update);
 }
-
-// Start the game when a match is found
 socket.on('matchFound', (data) => {
   document.getElementById("matchmakingStatus").innerHTML = "In coda 2/2..."
-
+  document.getElementById("matchmakingStatus").style.display = 'none';
   console.log('Match found with:', data.opponent);
   opponent.id = data.opponent;
   socket.emit('spawn');
 });
 
-// Handle waiting state
 socket.on('waiting', () => {
   document.getElementById("matchmakingStatus").innerHTML = "In coda 1/2..."
   console.log('Waiting for an opponent...');

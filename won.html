@@ -2,11 +2,39 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>GameOver</title>
+  <title>Partita Vinta</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background-color: #000;
+      font-family: Arial, sans-serif;
+      color: white;
+    }
+    h1 {
+      text-align: center;
+      margin-top: 20vh;
+      font-size: 3em;
+    }
+    button {
+      display: block;
+      margin: 0 auto;
+      padding: 10px 20px;
+      font-size: 1.5em;
+      background-color: #333;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #555;
+    }
+  </style>
 </head>
 <body>
-<h1>GameOver, HAI VINTO!</h1>
-<button>Gioca di Nuovo!</button>
+<h1>HAI VINTO😎!</h1>
+<button>🎮Gioca di Nuovo!</button>
 <script>
   const button = document.querySelector('button');
   button.addEventListener('click', () => {
