@@ -234,6 +234,7 @@ socket.on('playerMove', (data) => {
   }
   opponent.x = data.x;
   opponent.y = data.y;
+
 });
 
 // Handle shooting from opponent
@@ -306,7 +307,6 @@ function sendPing() {
 }
 
 setInterval(sendPing, 1000);
-// Health HUD and Ammo HUD
 function drawHUD() {
   ctx.fillStyle = 'white';
   ctx.font = '20px Arial';
