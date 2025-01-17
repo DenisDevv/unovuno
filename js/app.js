@@ -38,41 +38,45 @@ const opponent = {
   health: 120,
 };
 
-// Bullets array
 const bullets = [];
 
-// Map obstacles (15 total)
 const obstacles = [
-  { x: 150, y: 150, width: 100, height: 20 },
-  { x: 300, y: 300, width: 20, height: 100 },
-  { x: 500, y: 100, width: 150, height: 20 },
+  { x: 300, y: 200, width: 20, height: 100 },
+  { x: 500, y: 300, width: 150, height: 20 },
   { x: 700, y: 400, width: 20, height: 150 },
-  { x: 200, y: 500, width: 100, height: 20 },
-  { x: 600, y: 200, width: 20, height: 100 },
-  { x: 400, y: 250, width: 120, height: 20 },
-  { x: 650, y: 350, width: 20, height: 120 },
-  { x: 250, y: 450, width: 100, height: 20 },
-  { x: 550, y: 150, width: 20, height: 100 },
-  { x: 350, y: 500, width: 150, height: 20 },
-  { x: 450, y: 100, width: 20, height: 150 },
-  { x: 750, y: 300, width: 100, height: 20 },
-  { x: 100, y: 400, width: 20, height: 100 },
-  { x: 600, y: 50, width: 150, height: 20 },
+  { x: 900, y: 500, width: 100, height: 20 },
+  { x: 1100, y: 600, width: 20, height: 100 },
+  { x: 1300, y: 700, width: 120, height: 20 },
+  { x: 1500, y: 800, width: 20, height: 120 },
+  { x: 1700, y: 900, width: 100, height: 20 },
+  { x: 1900, y: 1000, width: 20, height: 100 },
+  { x: 200, y: 1100, width: 150, height: 20 },
+  { x: 400, y: 1200, width: 20, height: 150 },
+  { x: 600, y: 1300, width: 100, height: 20 },
+  { x: 800, y: 1400, width: 20, height: 100 },
+  { x: 1000, y: 1500, width: 150, height: 20 },
+  { x: 300, y: 100, width: 20, height: 100 },
+  { x: 500, y: 200, width: 150, height: 20 },
+  { x: 700, y: 300, width: 20, height: 150 },
+  { x: 900, y: 400, width: 100, height: 20 },
+  { x: 1100, y: 500, width: 20, height: 100 },
+  { x: 1300, y: 600, width: 120, height: 20 },
+  { x: 1500, y: 700, width: 20, height: 120 },
+  { x: 1700, y: 800, width: 100, height: 20 },
+  { x: 1900, y: 900, width: 20, height: 100 },
+  { x: 200, y: 1000, width: 150, height: 20 },
+  { x: 400, y: 100, width: 20, height: 150 },
+  { x: 600, y: 200, width: 100, height: 20 },
+  { x: 800, y: 800, width: 20, height: 100 },
+  { x: 1000, y: 300, width: 150, height: 20 },
+  { x: 1200, y: 500, width: 20, height: 100 },
+  { x: 1400, y:1700, width: 150, height: 20 },
 ];
 
-// Spawn points
-const spawnPoints = {
-  player: { x: 100, y: 100 }, // Top-left corner
-  opponent: { x: 1820, y: 980 }, // Bottom-right corner (1920x1080 minus player radius)
-};
-
-// Handle keyboard input
 const keys = {};
 
 window.addEventListener('keydown', (e) => {
   keys[e.key] = true;
-
-  // Reload on 'r' key press
   if (e.key === 'r' && !player.isReloading && player.bullets < player.magazineSize) {
     reloadMagazine();
   }
@@ -82,44 +86,21 @@ window.addEventListener('keyup', (e) => {
   keys[e.key] = false;
 });
 
-// Join matchmaking lobby
 matchButton.addEventListener('click', () => {
   checkFullscreen();
   socket.emit('joinLobby');
   lobbyUI.style.display = 'none';
 });
-// Handle Fullscreen Requirement
 function checkFullscreen() {
   if (document.fullscreenEnabled && !document.fullscreenElement) {
     document.documentElement.requestFullscreen().then(r => {
       console.log('Fullscreen enabled');
     });
-    //pauseGame();
-    //fullscreenWarning.style.display = 'flex';
-  } else {
-    //resumeGame();
-    //fullscreenWarning.style.display = 'none';
   }
 }
 
 window.addEventListener('resize', checkFullscreen);
-
-// Initial check
 checkFullscreen();
-
-// Pause and Resume Game
-function pauseGame() {
-  isPaused = true;
-}
-
-function resumeGame() {
-  if (isPaused) {
-    isPaused = false;
-    update();
-  }
-}
-
-// Move player based on keys pressed
 function movePlayer() {
   if (isPaused) return;
 
@@ -130,8 +111,6 @@ function movePlayer() {
 
   const newX = player.x + player.dx;
   const newY = player.y + player.dy;
-
-  // Check collision with map obstacles
   if (
     !isCollidingWithObstacles(newX, player.y, player.radius) &&
     !isCollidingWithObstacles(player.x, newY, player.radius)
@@ -140,16 +119,12 @@ function movePlayer() {
     player.y = newY;
     socket.emit('playerMove', { x: player.x, y: player.y });
   }
-
-  // Boundary checks
   player.x = Math.max(player.radius, Math.min(canvas.width - player.radius, player.x));
   player.y = Math.max(player.radius, Math.min(canvas.height - player.radius, player.y));
 
   player.dx = 0;
   player.dy = 0;
 }
-
-// Check collision with obstacles
 function isCollidingWithObstacles(x, y, radius) {
   for (let obstacle of obstacles) {
     if (
@@ -163,8 +138,6 @@ function isCollidingWithObstacles(x, y, radius) {
   }
   return false;
 }
-
-// Draw player on the canvas
 function drawPlayer(playerData) {
   ctx.beginPath();
   ctx.arc(playerData.x, playerData.y, playerData.radius, 0, Math.PI * 2);
@@ -172,8 +145,6 @@ function drawPlayer(playerData) {
   ctx.fill();
   ctx.closePath();
 }
-
-// Draw obstacles
 function drawObstacles() {
   ctx.fillStyle = 'gray';
   obstacles.forEach(obstacle => {
