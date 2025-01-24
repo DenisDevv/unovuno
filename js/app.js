@@ -24,7 +24,7 @@ const player = {
   reloadTime: 2500,
   name: null
 };
-
+document.getElementById("user").disabled = true;
 const opponent = {
   id: null,
   x: 0,
@@ -356,6 +356,6 @@ socket.on('healthUpdated', (data) => {
 socket.on('waiting', () => {
   document.getElementById("matchmakingStatus").innerHTML = "In coda 1/2...";
 });
-while (document.getElementById("user").value === "") {
-  document.getElementById("matchButton").disabled = true;
+while (document.getElementById("user").value !== "") {
+  document.getElementById("matchButton").disabled = false;
 }
