@@ -300,15 +300,15 @@ setInterval(sendPing, 1000);
 function drawHUD() {
   ctx.fillStyle = 'white';
   ctx.font = '20px Arial';
-  ctx.fillText(`Vita: ${player.health}`, 20, 30);
-  ctx.fillText(`Colpi: ${player.bullets}/${player.magazineSize}`, 20, 60);
+  ctx.fillText(`Vita: ${player.health}`, 30, 30);
+  ctx.fillText(`Colpi: ${player.bullets}/${player.magazineSize}`, 30, 60);
   if (player.isReloading) {
-    ctx.fillText(`Ricaricando..`, 20, 90);
+    ctx.fillText(`Ricaricando..`, 30, 90);
   }
   if (opponent.id) {
-    ctx.fillText(`Vita Avversario: ${opponent.health}`, 20, 120);
+    ctx.fillText(`Vita Avversario: ${opponent.health}`, 30, 120);
   }
-  ctx.fillText(`Ping: ${ping} ms`, 20, 150);
+  ctx.fillText(`Ping: ${ping} ms`, 30, 150);
 }
 
 function resetGame() {
@@ -331,12 +331,12 @@ function update() {
   drawHUD();
   requestAnimationFrame(update);
 }
-
 socket.on('matchFound', (data) => {
+  console.log('Match found:', data);
   document.getElementById("matchmakingStatus").innerHTML = "In coda 2/2...";
   document.getElementById("matchmakingStatus").style.display = 'none';
   opponent.id = data.opponent;
-  opponent.name = data.opponentName;
+  opponent.name = data.opponentName || 'Sconosciuto';
   socket.emit('spawn');
 });
 
