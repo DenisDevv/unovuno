@@ -24,7 +24,7 @@ const player = {
   reloadTime: 2500,
   name: null
 };
-document.getElementById("user").disabled = true;
+document.getElementById("matchButton").disabled = true;
 const opponent = {
   id: null,
   x: 0,
