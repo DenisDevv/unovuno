@@ -263,7 +263,6 @@ socket.on('playerHit', (data) => {
   }, 1000);
   if (player.health <= 0) {
     resetGame();
-    window.location.href = '/gameover';
   }
 });
 socket.on('opponentHealth', (data) => {
