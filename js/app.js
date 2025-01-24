@@ -298,17 +298,18 @@ function sendPing() {
 setInterval(sendPing, 1000);
 
 function drawHUD() {
+  const padding = 20;
   ctx.fillStyle = 'white';
   ctx.font = '20px Arial';
-  ctx.fillText(`Vita: ${player.health}`, 30, 30);
-  ctx.fillText(`Colpi: ${player.bullets}/${player.magazineSize}`, 30, 60);
+  ctx.fillText(`Vita: ${player.health}`, padding, 30);
+  ctx.fillText(`Colpi: ${player.bullets}/${player.magazineSize}`, padding, 60);
   if (player.isReloading) {
-    ctx.fillText(`Ricaricando..`, 30, 90);
+    ctx.fillText(`Ricaricando..`, padding, 90);
   }
   if (opponent.id) {
-    ctx.fillText(`Vita Avversario: ${opponent.health}`, 30, 120);
+    ctx.fillText(`Vita Avversario: ${opponent.health}`, padding, 120);
   }
-  ctx.fillText(`Ping: ${ping} ms`, 30, 150);
+  ctx.fillText(`Ping: ${ping} ms`, padding, 150);
 }
 
 function resetGame() {
