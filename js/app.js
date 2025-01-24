@@ -292,7 +292,7 @@ function drawHUD() {
     ctx.fillText(`Ricaricando..`, 20, 90);
   }
   if (opponent.id) {
-    ctx.fillText(`Opponent Health: ${opponent.health}`, 20, 120);
+    ctx.fillText(`Vita Avversario: ${opponent.health}`, 20, 120, ).color.set("red");
   }
   ctx.fillText(`Ping: ${ping} ms`, 20, 150);
 }
