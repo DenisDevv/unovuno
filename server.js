@@ -20,21 +20,21 @@ io.on('connection', async (socket) => {
   try {
     console.log('New player connected:', socket.id);
 
-    socket.on('joinLobby', async () => {
+    socket.on('joinLobby', async (playerData) => {
       try {
-        lobby.push(socket.id);
+        lobby.push({ id: socket.id, name: playerData.name });
         socket.emit('waiting');
         if (lobby.length >= 2) {
           const player1 = lobby.shift();
           const player2 = lobby.shift();
           const spawn1 = spawnPoints[0];
           const spawn2 = spawnPoints[1];
-          players[player1] = { health: 120, opponent: player2 };
-          players[player2] = { health: 120, opponent: player1 };
-          io.to(player1).emit('matchFound', { opponent: player2 });
-          io.to(player2).emit('matchFound', { opponent: player1 });
-          io.to(player1).emit('spawn', spawn1);
-          io.to(player2).emit('spawn', spawn2);
+          players[player1.id] = { health: 120, opponent: player2.id };
+          players[player2.id] = { health: 120, opponent: player1.id };
+          io.to(player1.id).emit('matchFound', { opponent: player2.id, opponentName: player2.name });
+          io.to(player2.id).emit('matchFound', { opponent: player1.id, opponentName: player1.name });
+          io.to(player1.id).emit('spawn', spawn1);
+          io.to(player2.id).emit('spawn', spawn2);
         }
       } catch (error) {
         console.error('Error in joinLobby:', error);

@@ -88,7 +88,7 @@ window.addEventListener('keyup', (e) => {
 matchButton.addEventListener('click', () => {
   checkFullscreen();
   player.name = document.getElementById("user").value;
-  socket.emit('joinLobby');
+  socket.emit('joinLobby', { name: player.name });
   document.getElementById("matchmakingStatus").style.display = 'block';
   lobbyUI.style.display = 'none';
 });
