@@ -21,7 +21,8 @@ const player = {
   magazineSize: 6,
   bullets: 0,
   isReloading: false,
-  reloadTime: 2500
+  reloadTime: 2500,
+  name: null
 };
 
 const opponent = {
@@ -30,7 +31,8 @@ const opponent = {
   y: 0,
   radius: 20,
   color: 'red',
-  health: 120
+  health: 120,
+  name: null,
 };
 
 const bullets = [];
@@ -74,6 +76,9 @@ window.addEventListener('keydown', (e) => {
   if (e.key === 'r' && !player.isReloading && player.bullets < player.magazineSize) {
     reloadMagazine();
   }
+  if (e.key === 'x') {
+    socket.emit('playerHit', { damage: 10 });
+  }
 });
 
 window.addEventListener('keyup', (e) => {
@@ -82,6 +87,7 @@ window.addEventListener('keyup', (e) => {
 
 matchButton.addEventListener('click', () => {
   checkFullscreen();
+  player.name = document.getElementById("user").value;
   socket.emit('joinLobby');
   document.getElementById("matchmakingStatus").style.display = 'block';
   lobbyUI.style.display = 'none';
@@ -143,6 +149,10 @@ function drawPlayer(playerData) {
   ctx.fillStyle = playerData.color;
   ctx.fill();
   ctx.closePath();
+  ctx.fillStyle = 'white';
+  ctx.font = '16px Arial';
+  ctx.textAlign = 'center';
+  ctx.fillText(playerData.name, playerData.x, playerData.y - playerData.radius - 10);
 }
 
 function drawObstacles() {
@@ -326,6 +336,7 @@ socket.on('matchFound', (data) => {
   document.getElementById("matchmakingStatus").innerHTML = "In coda 2/2...";
   document.getElementById("matchmakingStatus").style.display = 'none';
   opponent.id = data.opponent;
+  opponent.name = data.opponentName;
   socket.emit('spawn');
 });
 

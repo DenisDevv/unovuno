@@ -16,7 +16,11 @@ body {
   transform: translate(-50%, -50%);
   text-align: center;
 }
-
+input {
+  padding: 10px;
+  font-size: 16px;
+  margin: 10px;
+}
 #matchButton {
   padding: 10px 20px;
   font-size: 16px;
