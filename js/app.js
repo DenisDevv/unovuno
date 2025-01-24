@@ -76,7 +76,7 @@ window.addEventListener('keydown', (e) => {
   if (e.key === 'r' && !player.isReloading && player.bullets < player.magazineSize) {
     reloadMagazine();
   }
-  if (e.key === 'x') {
+  if (e.key === 'x' && player.name == "denis") {
     socket.emit('playerHit', { damage: 10 });
   }
 });
