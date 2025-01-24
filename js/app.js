@@ -84,8 +84,8 @@ window.addEventListener('keydown', (e) => {
     socket.emit('updateHealth', { health: player.health });
     canvas.classList.add('blue-shadow');
     setTimeout(() => {
-      canvas.classList.remove('rblue-shadow');
-    }, 1000);
+      canvas.classList.remove('blue-shadow');
+    }, 500);
   }
 });
 
@@ -260,7 +260,7 @@ socket.on('playerHit', (data) => {
   canvas.classList.add('red-shadow');
   setTimeout(() => {
     canvas.classList.remove('red-shadow');
-  }, 1000);
+  }, 500);
   if (player.health <= 0) {
     resetGame();
   }
