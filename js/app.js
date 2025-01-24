@@ -236,22 +236,18 @@ socket.on('shoot', (data) => {
 
 socket.on('reload', () => {});
 
+
 socket.on('playerHit', (data) => {
   player.health -= data.damage;
+  canvas.classList.add('red-shadow');
+  setTimeout(() => {
+    canvas.classList.remove('red-shadow');
+  }, 2000);
   if (player.health <= 0) {
     resetGame();
     window.location.href = '/gameover';
   }
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.save();
-  ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.globalCompositeOperation = 'destination-out';
-  ctx.fillStyle = 'black';
-  ctx.fillRect(20, 20, canvas.width - 40, canvas.height - 40);
-  ctx.restore();
 });
-
 socket.on('opponentHealth', (data) => {
   opponent.health = data.health;
 });
