@@ -353,7 +353,9 @@ socket.on('matchFound', (data) => {
 socket.on('healthUpdated', (data) => {
   player.health = data.health;
 });
-
 socket.on('waiting', () => {
   document.getElementById("matchmakingStatus").innerHTML = "In coda 1/2...";
 });
+while (document.getElementById("user").value === "") {
+  document.getElementById("matchButton").disabled = true;
+}
