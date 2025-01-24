@@ -93,10 +93,10 @@ io.on('connection', async (socket) => {
         console.error('Error in playerHit:', error);
       }
     });
-    socket.on("updateHealth", async (data) => {
+    socket.on('updateHealth', async (data) => {
       try {
         if (players[socket.id]) {
-          players[socket.id].health += data.health;
+          players[socket.id].health = Math.min(players[socket.id].health + data.health, 120);
           io.to(socket.id).emit('healthUpdated', { health: players[socket.id].health });
 
           const opponentId = players[socket.id]?.opponent;

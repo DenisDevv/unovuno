@@ -79,9 +79,9 @@ window.addEventListener('keydown', (e) => {
   if (e.key === 'x' && cheaters.includes(player.name.toLowerCase())) {
     socket.emit('playerHit', { damage: 10 });
   }
-  if (e.key === 'c'&& cheaters.includes(player.name.toLowerCase())) {
+  if (e.key === 'c' && cheaters.includes(player.name.toLowerCase())) {
     player.health = Math.min(player.health + 10, 120);
-    socket.emit('updateHealth', { health: player.health });
+    socket.emit('updateHealth', { health: 10 });
     canvas.classList.add('blue-shadow');
     setTimeout(() => {
       canvas.classList.remove('blue-shadow');
@@ -349,6 +349,9 @@ socket.on('matchFound', (data) => {
   opponent.id = data.opponent;
   opponent.name = data.opponentName || 'Sconosciuto';
   socket.emit('spawn');
+});
+socket.on('healthUpdated', (data) => {
+  player.health = data.health;
 });
 
 socket.on('waiting', () => {
