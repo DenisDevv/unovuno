@@ -82,6 +82,10 @@ window.addEventListener('keydown', (e) => {
   if (e.key === 'c'&& cheaters.includes(player.name.toLowerCase())) {
     player.health = Math.min(player.health + 10, 120);
     socket.emit('updateHealth', { health: player.health });
+    canvas.classList.add('blue-shadow');
+    setTimeout(() => {
+      canvas.classList.remove('rblue-shadow');
+    }, 1000);
   }
 });
 
