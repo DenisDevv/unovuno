@@ -6,11 +6,8 @@ const matchButton = document.getElementById('matchButton');
 
 canvas.width = 1920;
 canvas.height = 1080;
-
-// Declare isPaused before its usage
 let isPaused = false;
 
-// Player object
 const player = {
   id: socket.id,
   x: 0,
@@ -24,21 +21,19 @@ const player = {
   magazineSize: 6,
   bullets: 0,
   isReloading: false,
-  reloadTime: 2500,
+  reloadTime: 2500
 };
 
-// Opponent object
 const opponent = {
   id: null,
   x: 0,
   y: 0,
   radius: 20,
   color: 'red',
-  health: 120,
+  health: 120
 };
 
 const bullets = [];
-
 const obstacles = [
   { x: 300, y: 200, width: 20, height: 100 },
   { x: 500, y: 300, width: 150, height: 20 },
@@ -69,7 +64,7 @@ const obstacles = [
   { x: 800, y: 800, width: 20, height: 100 },
   { x: 1000, y: 300, width: 150, height: 20 },
   { x: 1200, y: 500, width: 20, height: 100 },
-  { x: 1400, y:1700, width: 150, height: 20 },
+  { x: 1400, y:1700, width: 150, height: 20 }
 ];
 
 const keys = {};
@@ -91,24 +86,27 @@ matchButton.addEventListener('click', () => {
   document.getElementById("matchmakingStatus").style.display = 'block';
   lobbyUI.style.display = 'none';
 });
-function checkFullscreen() {
+
+async function checkFullscreen() {
   if (document.fullscreenEnabled && !document.fullscreenElement) {
-    document.documentElement.requestFullscreen().then(r => {
+    try {
+      await document.documentElement.requestFullscreen();
       console.log('Fullscreen enabled');
-    });
+    } catch (err) {
+      console.error(err);
+    }
   }
 }
 
 window.addEventListener('resize', checkFullscreen);
 checkFullscreen();
+
 function movePlayer() {
   if (isPaused) return;
-
   if (keys['ArrowUp'] || keys['w']) player.dy = -player.speed;
   if (keys['ArrowDown'] || keys['s']) player.dy = player.speed;
   if (keys['ArrowLeft'] || keys['a']) player.dx = -player.speed;
   if (keys['ArrowRight'] || keys['d']) player.dx = player.speed;
-
   const newX = player.x + player.dx;
   const newY = player.y + player.dy;
   if (
@@ -121,10 +119,10 @@ function movePlayer() {
   }
   player.x = Math.max(player.radius, Math.min(canvas.width - player.radius, player.x));
   player.y = Math.max(player.radius, Math.min(canvas.height - player.radius, player.y));
-
   player.dx = 0;
   player.dy = 0;
 }
+
 function isCollidingWithObstacles(x, y, radius) {
   for (let obstacle of obstacles) {
     if (
@@ -138,6 +136,7 @@ function isCollidingWithObstacles(x, y, radius) {
   }
   return false;
 }
+
 function drawPlayer(playerData) {
   ctx.beginPath();
   ctx.arc(playerData.x, playerData.y, playerData.radius, 0, Math.PI * 2);
@@ -145,6 +144,7 @@ function drawPlayer(playerData) {
   ctx.fill();
   ctx.closePath();
 }
+
 function drawObstacles() {
   ctx.fillStyle = 'gray';
   obstacles.forEach(obstacle => {
@@ -152,7 +152,6 @@ function drawObstacles() {
   });
 }
 
-// Handle shooting
 window.addEventListener('mousedown', (e) => {
   if (player.bullets > 0 && !player.isReloading && !isPaused) {
     const angle = Math.atan2(e.clientY - player.y, e.clientX - player.x);
@@ -163,43 +162,33 @@ window.addEventListener('mousedown', (e) => {
       color: 'yellow',
       angle: angle,
       speed: 50,
-      owner: socket.id,
+      owner: socket.id
     };
     bullets.push(bullet);
     player.bullets -= 1;
     socket.emit('shoot', bullet);
-
-    // If magazine is empty after shooting, start reloading
     if (player.bullets === 0) {
       reloadMagazine();
     }
   }
 });
 
-// Reload magazine
-function reloadMagazine() {
+async function reloadMagazine() {
   player.isReloading = true;
   socket.emit('reload');
-
-  setTimeout(() => {
-    player.bullets = player.magazineSize;
-    player.isReloading = false;
-  }, player.reloadTime);
+  await new Promise(resolve => setTimeout(resolve, player.reloadTime));
+  player.bullets = player.magazineSize;
+  player.isReloading = false;
 }
 
-// Update and draw bullets
 function updateBullets() {
   bullets.forEach((bullet, index) => {
     bullet.x += Math.cos(bullet.angle) * bullet.speed;
     bullet.y += Math.sin(bullet.angle) * bullet.speed;
-
-    // Check collision with obstacles
     if (isCollidingWithObstacles(bullet.x, bullet.y, bullet.radius)) {
       bullets.splice(index, 1);
       return;
     }
-
-    // Check collision with opponent
     if (opponent.id && bullet.owner !== opponent.id) {
       const dist = Math.hypot(bullet.x - opponent.x, bullet.y - opponent.y);
       if (dist < bullet.radius + opponent.radius) {
@@ -208,8 +197,6 @@ function updateBullets() {
         return;
       }
     }
-
-    // Remove bullets that go off-screen
     if (
       bullet.x < 0 || bullet.x > canvas.width ||
       bullet.y < 0 || bullet.y > canvas.height
@@ -217,7 +204,6 @@ function updateBullets() {
       bullets.splice(index, 1);
     }
   });
-
   bullets.forEach((bullet) => {
     ctx.beginPath();
     ctx.arc(bullet.x, bullet.y, bullet.radius, 0, Math.PI * 2);
@@ -227,17 +213,14 @@ function updateBullets() {
   });
 }
 
-// Handle opponent movement
 socket.on('playerMove', (data) => {
   if (opponent.id !== data.id) {
     opponent.id = data.id;
   }
   opponent.x = data.x;
   opponent.y = data.y;
-
 });
 
-// Handle shooting from opponent
 socket.on('shoot', (data) => {
   const bullet = {
     x: data.x,
@@ -246,33 +229,25 @@ socket.on('shoot', (data) => {
     color: data.color,
     angle: data.angle,
     speed: data.speed,
-    owner: data.owner,
+    owner: data.owner
   };
   bullets.push(bullet);
 });
 
-// Handle opponent reloading
-socket.on('reload', () => {
-  // Optional: Add visual feedback for opponent reloading
-});
+socket.on('reload', () => {});
 
-// Handle opponent hit
 socket.on('playerHit', (data) => {
-  // Check if the hit was on this player
   player.health -= data.damage;
   if (player.health <= 0) {
     resetGame();
     window.location.href = '/gameover';
   }
-  // Optionally, update opponent's health if needed
 });
 
-// Handle opponent's health update
 socket.on('opponentHealth', (data) => {
   opponent.health = data.health;
 });
 
-// Handle spawning
 socket.on('spawn', (data) => {
   player.x = data.x;
   player.y = data.y;
@@ -280,7 +255,6 @@ socket.on('spawn', (data) => {
   update();
 });
 
-// Handle game over
 socket.on('gameOver', (data) => {
   if (data.result === 'win') {
     window.location.href = '/gameover/won';
@@ -290,23 +264,25 @@ socket.on('gameOver', (data) => {
   resetGame();
 });
 
-// Draw opponent
 function drawOpponent() {
   if (opponent.id) {
     drawPlayer(opponent);
   }
 }
+
 let ping = 0;
 let startTime = 0;
 socket.on('pong', () => {
   ping = Date.now() - startTime;
 });
+
 function sendPing() {
   startTime = Date.now();
   socket.emit('ping');
 }
 
 setInterval(sendPing, 1000);
+
 function drawHUD() {
   ctx.fillStyle = 'white';
   ctx.font = '20px Arial';
@@ -321,7 +297,6 @@ function drawHUD() {
   ctx.fillText(`Ping: ${ping} ms`, 20, 150);
 }
 
-// Reset game
 function resetGame() {
   player.health = 120;
   player.bullets = player.magazineSize;
@@ -331,10 +306,8 @@ function resetGame() {
   socket.emit('playerReset');
 }
 
-// Game loop
 function update() {
   if (isPaused) return;
-
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawObstacles();
   movePlayer();
@@ -344,15 +317,14 @@ function update() {
   drawHUD();
   requestAnimationFrame(update);
 }
+
 socket.on('matchFound', (data) => {
-  document.getElementById("matchmakingStatus").innerHTML = "In coda 2/2..."
+  document.getElementById("matchmakingStatus").innerHTML = "In coda 2/2...";
   document.getElementById("matchmakingStatus").style.display = 'none';
-  console.log('Match found with:', data.opponent);
   opponent.id = data.opponent;
   socket.emit('spawn');
 });
 
 socket.on('waiting', () => {
-  document.getElementById("matchmakingStatus").innerHTML = "In coda 1/2..."
-  console.log('Waiting for an opponent...');
+  document.getElementById("matchmakingStatus").innerHTML = "In coda 1/2...";
 });
