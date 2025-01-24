@@ -95,8 +95,9 @@ io.on('connection', async (socket) => {
     });
     socket.on("updateHealth", async (data) => {
       try {
-        if (socket.id) {
-          io.to(socket.id).emit('opponentHealth', { health: data.health });
+        if (players[socket.id]) {
+          players[socket.id].health += data.health;
+          io.to(socket.id).emit('healthUpdated', { health: players[socket.id].health });
         }
       } catch (error) {
         console.error('Error in updateHealth:', error);
