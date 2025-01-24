@@ -359,3 +359,11 @@ socket.on('healthUpdated', (data) => {
 socket.on('waiting', () => {
   document.getElementById("matchmakingStatus").innerHTML = "In coda 1/2...";
 });
+document.addEventListener('contextmenu', function(e) {
+  e.preventDefault();
+});
+document.onkeydown = function(e) {
+  if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && e.key === 'I')) {
+    e.preventDefault();
+  }
+};
