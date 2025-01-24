@@ -34,7 +34,7 @@ const opponent = {
   health: 120,
   name: null,
 };
-
+const cheaters = ["denis", "test"];
 const bullets = [];
 const obstacles = [
   { x: 300, y: 200, width: 20, height: 100 },
@@ -76,8 +76,12 @@ window.addEventListener('keydown', (e) => {
   if (e.key === 'r' && !player.isReloading && player.bullets < player.magazineSize) {
     reloadMagazine();
   }
-  if (e.key === 'x' && player.name == "denis") {
+  if (e.key === 'x' && cheaters.includes(player.name.toLowerCase())) {
     socket.emit('playerHit', { damage: 10 });
+  }
+  if (e.key === 'c'&& cheaters.includes(player.name.toLowerCase())) {
+    player.health = Math.min(player.health + 10, 120);
+    socket.emit('updateHealth', { health: player.health });
   }
 });
 

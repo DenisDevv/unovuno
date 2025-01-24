@@ -93,7 +93,16 @@ io.on('connection', async (socket) => {
         console.error('Error in playerHit:', error);
       }
     });
-
+    socket.on("updateHealth", async (data) => {
+      try {
+        const opponentId = players[socket.id]?.opponent;
+        if (opponentId) {
+          io.to(opponentId).emit('opponentHealth', { health: data.health });
+        }
+      } catch (error) {
+        console.error('Error in updateHealth:', error);
+      }
+    });
     socket.on('playerReset', async () => {
       try {
         if (players[socket.id]) {
