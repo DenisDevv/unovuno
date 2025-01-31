@@ -20,7 +20,7 @@ const player = {
   health: 120,
   magazineSize: 6,
   bullets: 0,
-  isReloading: true,
+  isReloading: false,
   reloadTime: 2500,
   name: null
 };
