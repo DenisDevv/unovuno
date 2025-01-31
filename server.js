@@ -18,7 +18,7 @@ const players = {};
 
 io.on('connection', async (socket) => {
   try {
-    console.log('New player connected:', socket.id);
+    console.log('Nuovo player connesso:', socket.id);
 
     socket.on('joinLobby', async (playerData) => {
       try {
@@ -37,7 +37,7 @@ io.on('connection', async (socket) => {
           io.to(player2.id).emit('spawn', spawn2);
         }
       } catch (error) {
-        console.error('Error in joinLobby:', error);
+        console.error('Errore nel joinLobby:', error);
       }
     });
 
@@ -48,7 +48,7 @@ io.on('connection', async (socket) => {
           io.to(opponentId).emit('playerMove', { id: socket.id, x: data.x, y: data.y });
         }
       } catch (error) {
-        console.error('Error in playerMove:', error);
+        console.error('Errore nel playerMove:', error);
       }
     });
 
@@ -59,7 +59,7 @@ io.on('connection', async (socket) => {
           io.to(opponentId).emit('shoot', data);
         }
       } catch (error) {
-        console.error('Error in shoot:', error);
+        console.error('Errore nel shoot:', error);
       }
     });
 
@@ -70,7 +70,7 @@ io.on('connection', async (socket) => {
           io.to(opponentId).emit('reload');
         }
       } catch (error) {
-        console.error('Error in reload:', error);
+        console.error('Errore nel reload:', error);
       }
     });
 
@@ -78,19 +78,19 @@ io.on('connection', async (socket) => {
       try {
         const opponentId = players[socket.id]?.opponent;
         if (opponentId && players[opponentId]) {
-          players[opponentId].health -= data.damage;
-          if (players[opponentId].health < 0) players[opponentId].health = 0;
-          io.to(opponentId).emit('playerHit', { damage: data.damage });
-          io.to(socket.id).emit('opponentHealth', { health: players[opponentId].health });
+          await players[opponentId].health -= data.damage;
+          if (players[opponentId].health < 0) await players[opponentId].health = 0;
+          await io.to(opponentId).emit('playerHit', { damage: data.damage });
+          await io.to(socket.id).emit('opponentHealth', { health: players[opponentId].health });
           if (players[opponentId].health <= 0) {
-            io.to(socket.id).emit('gameOver', { result: 'win' });
-            io.to(opponentId).emit('gameOver', { result: 'lose' });
-            players[socket.id].health = 120;
-            players[opponentId].health = 120;
+            await io.to(socket.id).emit('gameOver', { result: 'win' });
+            await io.to(opponentId).emit('gameOver', { result: 'lose' });
+            await players[socket.id].health = 120;
+            await  players[opponentId].health = 120;
           }
         }
       } catch (error) {
-        console.error('Error in playerHit:', error);
+        console.error('Errore nel playerHit:', error);
       }
     });
     socket.on('updateHealth', async (data) => {
@@ -105,7 +105,7 @@ io.on('connection', async (socket) => {
           }
         }
       } catch (error) {
-        console.error('Error in updateHealth:', error);
+        console.error('Errore nel updateHealth:', error);
       }
     });
     socket.on('playerReset', async () => {
@@ -115,7 +115,7 @@ io.on('connection', async (socket) => {
           io.to(socket.id).emit('resetConfirmed');
         }
       } catch (error) {
-        console.error('Error in playerReset:', error);
+        console.error('Errore nel playerReset:', error);
       }
     });
 
@@ -123,13 +123,13 @@ io.on('connection', async (socket) => {
       try {
         socket.emit('pong');
       } catch (error) {
-        console.error('Error in ping:', error);
+        console.error('Errore nel ping:', error);
       }
     });
 
     socket.on('disconnect', async () => {
       try {
-        console.log('Player disconnected:', socket.id);
+        console.log('Player disconnesso:', socket.id);
         lobby = lobby.filter(id => id !== socket.id);
         const opponentId = players[socket.id]?.opponent;
         if (opponentId) {
@@ -139,11 +139,11 @@ io.on('connection', async (socket) => {
         }
         delete players[socket.id];
       } catch (error) {
-        console.error('Error in disconnect:', error);
+        console.error('Errore nel disconnect:', error);
       }
     });
   } catch (error) {
-    console.error('Error with connection event:', error);
+    console.error("Errore nel tentativo di connessione:", error);
   }
 });
 
@@ -151,7 +151,7 @@ app.get("/gameover/won", async (req, res) => {
   try {
     res.sendFile(__dirname + "/won.html");
   } catch (error) {
-    console.error('Error in /gameover/won route:', error);
+    console.error('Errore nel /gameover/won:', error);
     res.status(500).send('Server Error');
   }
 });
@@ -160,15 +160,15 @@ app.get("/gameover/lost", async (req, res) => {
   try {
     res.sendFile(__dirname + "/lost.html");
   } catch (error) {
-    console.error('Error in /gameover/lost route:', error);
-    res.status(500).send('Server Error');
+    console.error('Errore nel /gameover/lost:', error);
+    res.status(500).send('Errore Server');
   }
 });
 
 server.listen(3000, '0.0.0.0', async () => {
   try {
-    console.log('Server is running on port 3000');
+    console.log('Il server è in esecuzione nella porta 3000');
   } catch (error) {
-    console.error('Error starting server:', error);
+    console.error("Errore nell'avviare il server:", error);
   }
 });
