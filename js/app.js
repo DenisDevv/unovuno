@@ -234,6 +234,7 @@ function updateBullets() {
   });
 }
 socket.on("connect", (classifica) => {
+  console.log(classifica);
   const primo = classifica[0];
   const secondo = classifica[1];
   const terzo = classifica[2];
