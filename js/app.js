@@ -242,7 +242,7 @@ socket.on("connected", (data) => {
     topThree.forEach((entry, index) => {
       const option = document.createElement('option');
       option.text = `${index + 1}° ${entry.id} - ${entry.value} punti`;
-      leaderboard.appendChild(option);
+      leaderboard.appendChild(option).id = index + 1;
     });
   } else {
     console.error('Leaderboard data is undefined or invalid');
