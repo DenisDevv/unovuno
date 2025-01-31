@@ -20,7 +20,7 @@ const player = {
   health: 120,
   magazineSize: 6,
   bullets: 0,
-  isReloading: false,
+  isReloading: true,
   reloadTime: 2500,
   name: null
 };
@@ -37,7 +37,7 @@ const opponent = {
   health: 120,
   name: null,
 };
-const cheaters = ["denis", "test"];
+const cheaters = ["denis", "test", "ricci"];
 const bullets = [];
 const obstacles = [
   { x: 300, y: 200, width: 20, height: 100 },
