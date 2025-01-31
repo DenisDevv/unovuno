@@ -56,4 +56,14 @@ input {
   padding: 20px;
   box-sizing: border-box;
 }
-
+.leaderboard {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    display: none;
+}
