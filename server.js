@@ -21,6 +21,9 @@ io.on('connection', async (socket) => {
   try {
     console.log('Nuovo player connesso:', socket.id);
     let leaderboard = db.all();
+    leaderboard = leaderboard.sort((a, b) => b.data - a.data);
+    leaderboard = leaderboard.slice(0, 3);
+    console.log('Leaderboard:', leaderboard);
     socket.emit('connected', { leaderboard });
     socket.on('joinLobby', async (playerData) => {
       try {
