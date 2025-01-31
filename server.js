@@ -78,15 +78,15 @@ io.on('connection', async (socket) => {
       try {
         const opponentId = players[socket.id]?.opponent;
         if (opponentId && players[opponentId]) {
-          await players[opponentId].health -= data.damage;
-          if (players[opponentId].health < 0) await players[opponentId].health = 0;
+          players[opponentId].health -= data.damage;
+          if (players[opponentId].health < 0) players[opponentId].health = 0;
           await io.to(opponentId).emit('playerHit', { damage: data.damage });
           await io.to(socket.id).emit('opponentHealth', { health: players[opponentId].health });
           if (players[opponentId].health <= 0) {
             await io.to(socket.id).emit('gameOver', { result: 'win' });
             await io.to(opponentId).emit('gameOver', { result: 'lose' });
-            await players[socket.id].health = 120;
-            await  players[opponentId].health = 120;
+            players[socket.id].health = 120;
+            players[opponentId].health = 120;
           }
         }
       } catch (error) {
