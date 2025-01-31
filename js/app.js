@@ -7,7 +7,7 @@ const matchButton = document.getElementById('matchButton');
 canvas.width = 1920;
 canvas.height = 1080;
 let isPaused = false;
-
+const leaderboard = document.getElementById('leaderboard');
 const player = {
   id: socket.id,
   x: 0,
@@ -233,7 +233,14 @@ function updateBullets() {
     ctx.closePath();
   });
 }
-
+socket.on("connect", (classifica) => {
+  const primo = classifica[0];
+  const secondo = classifica[1];
+  const terzo = classifica[2];
+  leaderboard.add(new Option(`1° ${primo.name} - ${primo.value} punti`));
+  leaderboard.add(new Option(`2° ${secondo.name} - ${secondo.value} punti`));
+  leaderboard.add(new Option(`3° ${terzo.name} - ${terzo.value} punti`));
+});
 socket.on('playerMove', (data) => {
   if (opponent.id !== data.id) {
     opponent.id = data.id;
