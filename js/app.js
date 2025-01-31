@@ -238,7 +238,7 @@ socket.on("connect", (classifica) => {
   const primo = classifica[0];
   const secondo = classifica[1];
   const terzo = classifica[2];
-  leaderboard.add(new Option(`1° ${primo.name} - ${primo.value} punti`));
+  leaderboard.add(new Option(`1° ${primo.id} - ${primo.value} punti`));
   leaderboard.add(new Option(`2° ${secondo.name} - ${secondo.value} punti`));
   leaderboard.add(new Option(`3° ${terzo.name} - ${terzo.value} punti`));
 });
