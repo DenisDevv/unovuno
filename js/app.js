@@ -234,6 +234,7 @@ function updateBullets() {
   });
 }
 socket.on("connect", (data) => {
+  console.log('Received data:', data); // Log the received data
   const leaderboardData = data.leaderboard;
   leaderboardData.sort((a, b) => b.value - a.value);
   const topThree = leaderboardData.slice(0, 3);
