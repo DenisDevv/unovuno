@@ -5,7 +5,8 @@ const socketIo = require('socket.io');
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
-
+const { QuickDB } = require("quick.db");
+const db = new QuickDB();
 app.use(express.static('./'));
 
 let lobby = [];
@@ -84,6 +85,7 @@ io.on('connection', async (socket) => {
           await io.to(socket.id).emit('opponentHealth', { health: players[opponentId].health });
           if (players[opponentId].health <= 0) {
             await io.to(socket.id).emit('gameOver', { result: 'win' });
+            await db.add(`${players[socket.id].name}`, 100);
             await io.to(opponentId).emit('gameOver', { result: 'lose' });
             players[socket.id].health = 120;
             players[opponentId].health = 120;
@@ -133,6 +135,7 @@ io.on('connection', async (socket) => {
         lobby = lobby.filter(id => id !== socket.id);
         const opponentId = players[socket.id]?.opponent;
         if (opponentId) {
+          await db.add(`${players[opponentId].name}`, 50);
           io.to(opponentId).emit('opponentDisconnected');
           players[opponentId].health = 120;
           delete players[opponentId].opponent;

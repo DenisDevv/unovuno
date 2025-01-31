@@ -288,6 +288,7 @@ socket.on('gameOver', (data) => {
   resetGame();
 });
 socket.on("opponentDisconnected", () => {
+
   window.location.href = "/gameover/won";
 });
 
