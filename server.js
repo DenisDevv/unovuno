@@ -88,7 +88,7 @@ io.on('connection', async (socket) => {
           if (players[opponentId].health <= 0) {
             await io.to(socket.id).emit('gameOver', { result: 'win' });
             console.log("Vittoria di", players[socket.id]);
-            await db.add(`${players[socket.id].name}`, 100);
+            await db.add(`${lobby[socket.id].name}`, 100);
             await io.to(opponentId).emit('gameOver', { result: 'lose' });
             players[socket.id].health = 120;
             players[opponentId].health = 120;
@@ -138,7 +138,7 @@ io.on('connection', async (socket) => {
         lobby = lobby.filter(id => id !== socket.id);
         const opponentId = players[socket.id]?.opponent;
         if (opponentId) {
-          await db.add(`${players[opponentId].name}`, 50);
+          await db.add(`${lobby[opponentId].name}`, 50);
           io.to(opponentId).emit('opponentDisconnected');
           players[opponentId].health = 120;
           delete players[opponentId].opponent;
