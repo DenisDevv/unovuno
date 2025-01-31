@@ -87,6 +87,7 @@ io.on('connection', async (socket) => {
           await io.to(socket.id).emit('opponentHealth', { health: players[opponentId].health });
           if (players[opponentId].health <= 0) {
             await io.to(socket.id).emit('gameOver', { result: 'win' });
+            console.log("Vittoria di", players[socket.id]);
             await db.add(`${players[socket.id].name}`, 100);
             await io.to(opponentId).emit('gameOver', { result: 'lose' });
             players[socket.id].health = 120;
