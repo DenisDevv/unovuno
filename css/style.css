@@ -64,12 +64,12 @@ input {
     color: white;
     display: block;
 }
-#1  {
+.champion  {
   color: #ff0059;
 }
-#2 {
+.diamond {
     color: #7b00ff;
 }
-#3 {
+.emerald {
     color: #00981c;
 }

@@ -244,9 +244,9 @@ socket.on("connected", (data) => {
       option.text = `${index + 1}° ${entry.id} - ${entry.value} punti`;
       leaderboard.appendChild(option);
     });
-    document.getElementById("leaderboard").children[0].id = 1;
-    document.getElementById("leaderboard").children[1].id = 2;
-    document.getElementById("leaderboard").children[2].id = 3;
+    document.getElementById("leaderboard").children[0].classList.add("champion");
+    document.getElementById("leaderboard").children[1].classList.add("diamond");
+    document.getElementById("leaderboard").children[2].classList.add("emerald");
   } else {
     console.error('Leaderboard data is undefined or invalid');
   }
