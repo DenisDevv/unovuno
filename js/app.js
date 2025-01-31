@@ -233,14 +233,15 @@ function updateBullets() {
     ctx.closePath();
   });
 }
-socket.on("connect", (classifica) => {
-  console.log(classifica);
-  const primo = classifica[0];
-  const secondo = classifica[1];
-  const terzo = classifica[2];
-  leaderboard.add(new Option(`1° ${primo.id} - ${primo.value} punti`));
-  leaderboard.add(new Option(`2° ${secondo.name} - ${secondo.value} punti`));
-  leaderboard.add(new Option(`3° ${terzo.name} - ${terzo.value} punti`));
+socket.on("connect", (data) => {
+  const leaderboardData = data.leaderboard;
+  leaderboardData.sort((a, b) => b.value - a.value);
+  const topThree = leaderboardData.slice(0, 3);
+  topThree.forEach((entry, index) => {
+    const option = document.createElement('option');
+    option.text = `${index + 1}° ${entry.id} - ${entry.value} punti`;
+    leaderboard.add(option);
+  });
 });
 socket.on('playerMove', (data) => {
   if (opponent.id !== data.id) {
