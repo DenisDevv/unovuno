@@ -65,5 +65,5 @@ input {
     box-sizing: border-box;
     background-color: rgba(0, 0, 0, 0.5);
     color: white;
-    display: none;
+    display: block;
 }
