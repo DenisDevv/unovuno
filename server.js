@@ -19,11 +19,12 @@ const players = {};
 
 io.on('connection', async (socket) => {
   try {
-    console.log('Nuovo player connesso:', socket.id);
+    console.log('New player connected:', socket.id);
     let leaderboard = await db.all();
     if (!leaderboard) {
       leaderboard = [];
     }
+    console.log('Leaderboard data:', leaderboard); // Log the leaderboard data
     await socket.emit('connected', { leaderboard });
     socket.on('joinLobby', async (playerData) => {
       try {
