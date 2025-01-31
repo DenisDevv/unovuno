@@ -233,7 +233,7 @@ function updateBullets() {
     ctx.closePath();
   });
 }
-socket.on("connect", (data) => {
+socket.on("connected", (data) => {
   console.log('Received data:', data); // Log the received data
   const leaderboardData = data.leaderboard;
   leaderboardData.sort((a, b) => b.value - a.value);
