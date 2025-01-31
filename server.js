@@ -32,8 +32,8 @@ io.on('connection', async (socket) => {
           const player2 = lobby.shift();
           const spawn1 = spawnPoints[0];
           const spawn2 = spawnPoints[1];
-          players[player1.id] = { health: 120, opponent: player2.id };
-          players[player2.id] = { health: 120, opponent: player1.id };
+          players[player1.id] = { health: 120, opponent: player2.id, name: player1.name };
+          players[player2.id] = { health: 120, opponent: player1.id, name: player2.name };
           io.to(player1.id).emit('matchFound', { opponent: player2.id, opponentName: player2.name });
           io.to(player2.id).emit('matchFound', { opponent: player1.id, opponentName: player1.name });
           io.to(player1.id).emit('spawn', spawn1);
@@ -87,8 +87,8 @@ io.on('connection', async (socket) => {
           await io.to(socket.id).emit('opponentHealth', { health: players[opponentId].health });
           if (players[opponentId].health <= 0) {
             await io.to(socket.id).emit('gameOver', { result: 'win' });
-            console.log("Vittoria di", lobby[socket.id]);
-            await db.add(`${lobby[socket.id].name}`, 100);
+            console.log("Vittoria di", players[socket.id]);
+            await db.add(`${players[socket.id].name}`, 100);
             await io.to(opponentId).emit('gameOver', { result: 'lose' });
             players[socket.id].health = 120;
             players[opponentId].health = 120;
@@ -138,7 +138,7 @@ io.on('connection', async (socket) => {
         lobby = lobby.filter(id => id !== socket.id);
         const opponentId = players[socket.id]?.opponent;
         if (opponentId) {
-          await db.add(`${lobby[opponentId].name}`, 50);
+          await db.add(`${players[opponentId].name}`, 50);
           io.to(opponentId).emit('opponentDisconnected');
           players[opponentId].health = 120;
           delete players[opponentId].opponent;
