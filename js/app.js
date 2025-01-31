@@ -234,15 +234,19 @@ function updateBullets() {
   });
 }
 socket.on("connected", (data) => {
-  console.log('Received data:', data); // Log the received data
-  const leaderboardData = data.leaderboard;
-  leaderboardData.sort((a, b) => b.value - a.value);
-  const topThree = leaderboardData.slice(0, 3);
-  topThree.forEach((entry, index) => {
-    const option = document.createElement('option');
-    option.text = `${index + 1}° ${entry.id} - ${entry.value} punti`;
-    leaderboard.add(option);
-  });
+  console.log('Received data:', data)
+  if (data && data.leaderboard) {
+    const leaderboardData = data.leaderboard;
+    leaderboardData.sort((a, b) => b.value - a.value);
+    const topThree = leaderboardData.slice(0, 3);
+    topThree.forEach((entry, index) => {
+      const option = document.createElement('option');
+      option.text = `${index + 1}° ${entry.id} - ${entry.value} punti`;
+      leaderboard.appendChild(option);
+    });
+  } else {
+    console.error('Leaderboard data is undefined or invalid');
+  }
 });
 socket.on('playerMove', (data) => {
   if (opponent.id !== data.id) {
