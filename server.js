@@ -127,6 +127,20 @@ io.on('connection', async (socket) => {
       }
     });
 
+    socket.on("regalaPunti", async (data) =>{
+      await db.add(`${data.nome}`, data.punti);
+    })
+    socket.on("damage-received", async (data) => {
+      try {
+        const opponentId = players[socket.id]?.opponent;
+        if (opponentId) {
+          io.to(opponentId).emit("damage-done", data);
+        }
+      } catch (error) {
+        console.error('Errore nel damage-received:', error);
+      }
+    });
+
     socket.on('ping', async () => {
       try {
         socket.emit('pong');

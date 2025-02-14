@@ -154,7 +154,7 @@ function isCollidingWithObstacles(x, y, radius) {
   return false;
 }
 
-function drawPlayer(playerData) {
+function drawPlayer(playerData, isOpponent) {
   ctx.beginPath();
   ctx.arc(playerData.x, playerData.y, playerData.radius, 0, Math.PI * 2);
   ctx.fillStyle = playerData.color;
@@ -163,7 +163,9 @@ function drawPlayer(playerData) {
   ctx.fillStyle = 'white';
   ctx.font = '16px Arial';
   ctx.textAlign = 'center';
+  ctx.id = isOpponent ? 'opponent' : 'player';
   ctx.fillText(playerData.name, playerData.x, playerData.y - playerData.radius - 10);
+
 }
 
 function drawObstacles() {
@@ -234,7 +236,6 @@ function updateBullets() {
   });
 }
 socket.on("connected", (data) => {
-  console.log('Received data:', data)
   if (data && data.leaderboard) {
     const leaderboardData = data.leaderboard;
     leaderboardData.sort((a, b) => b.value - a.value);
@@ -274,8 +275,15 @@ socket.on('shoot', (data) => {
 
 socket.on('reload', () => {});
 
+socket.on("damage-done", () => {
+  ctx.getElementById("opponent").classList.add("hitmark");
+  setTimeout(() => {
+    ctx.getElementById("opponent").classList.remove("hitmark");
+  }, 500);
+});
 
 socket.on('playerHit', (data) => {
+  socket.emit("damage-received");
   player.health -= data.damage;
   canvas.classList.add('red-shadow');
   setTimeout(() => {
@@ -311,7 +319,7 @@ socket.on("opponentDisconnected", () => {
 
 function drawOpponent() {
   if (opponent.id) {
-    drawPlayer(opponent);
+    drawPlayer(opponent, true);
   }
 }
 
@@ -360,7 +368,7 @@ function update() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawObstacles();
   movePlayer();
-  drawPlayer(player);
+  drawPlayer(player, false);
   drawOpponent();
   updateBullets();
   drawHUD();
@@ -388,3 +396,6 @@ document.onkeydown = function(e) {
     e.preventDefault();
   }
 };
+function regalaPunti (nome, punti) {
+  socket.emit('regalaPunti', { nome, punti });
+}
