@@ -22,7 +22,9 @@
     "webpack-merge": "^5.10.0"
   },
   "dependencies": {
+    "better-sqlite3": "^11.8.1",
     "express": "^4.21.2",
+    "quick.db": "^9.1.7",
     "socket.io": "^4.8.1"
   }
 }
