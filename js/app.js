@@ -37,7 +37,7 @@ const opponent = {
   health: 120,
   name: null,
 };
-const cheaters = ["denis", "test", "ricci"];
+const cheaters = ["denis"];
 const bullets = [];
 const obstacles = [
   { x: 300, y: 200, width: 50, height: 100 },
