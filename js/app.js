@@ -249,7 +249,7 @@ socket.on("connected", (data) => {
     document.getElementById("leaderboard").children[1].classList.add("diamond");
     document.getElementById("leaderboard").children[2].classList.add("emerald");
   } else {
-    console.error('Leaderboard data is undefined or invalid');
+    console.error('La leaderboard è invalida');
   }
 });
 socket.on('playerMove', (data) => {
