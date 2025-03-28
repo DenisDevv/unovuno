@@ -212,14 +212,6 @@ function updateBullets() {
       bullets.splice(index, 1);
       return;
     }
-    if (opponent.id && bullet.owner !== opponent.id) {
-      const dist = Math.hypot(bullet.x - opponent.x, bullet.y - opponent.y);
-      if (dist < bullet.radius + opponent.radius) {
-        bullets.splice(index, 1);
-        socket.emit('playerHit', { damage: 10 });
-        return;
-      }
-    }
     if (
       bullet.x < 0 || bullet.x > canvas.width ||
       bullet.y < 0 || bullet.y > canvas.height

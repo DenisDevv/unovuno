@@ -35,22 +35,75 @@ io.on('connection', async (socket) => {
           const player2 = lobby.shift();
           const spawn1 = spawnPoints[0];
           const spawn2 = spawnPoints[1];
-          players[player1.id] = { health: 120, opponent: player2.id, name: player1.name };
-          players[player2.id] = { health: 120, opponent: player1.id, name: player2.name };
+          players[player1.id] = { health: 120, opponent: player2.id, name: player1.name, x:0, y:0, bullets: []};
+          players[player2.id] = { health: 120, opponent: player1.id, name: player2.name, x:0, y:0, bullets: []};
           io.to(player1.id).emit('matchFound', { opponent: player2.id, opponentName: player2.name });
           io.to(player2.id).emit('matchFound', { opponent: player1.id, opponentName: player1.name });
           io.to(player1.id).emit('spawn', spawn1);
           io.to(player2.id).emit('spawn', spawn2);
+          loop();
+          function loop() {
+            console.log("Looping...");
+            setTimeout(() => {
+              let px = players[player1.id].x;
+              let py = players[player1.id].y;
+              let ox = players[player2.id].x;
+              let oy = players[player2.id].y;
+              let bullets = players[player1.id].bullets;
+              bullets.forEach(async (bullets, index) => {
+                if (bullet.owner !== player2.id) {
+                  const dist = Math.hypot(bullet.x - player2.x, bullet.y - player2.y);
+                  if (dist < bullet.radius + player2.radius) {
+                    bullets.splice(index, 1);
+                    players[player2.id].health -= data.damage;
+                    if (players[player2.id].health < 0) players[player2.id].health = 0;
+                      await io.to(players[player2.id]).emit('playerHit', { damage: data.damage });
+                      await io.to(players[player1.id]).emit('opponentHealth', { health: players[player2.id].health });
+                      if (players[player2.id].health <= 0) {
+                        await io.to(players[player1.id]).emit('gameOver', { result: 'win' });
+                        console.log("Vittoria di", players[player1.id]);
+                        await db.add(`${players[player1.id].name}`, 100);
+                        await io.to(players[player2.id]).emit('gameOver', { result: 'lose' });
+                        players[player1.id].health = 120;
+                        players[player2.id].health = 120;
+                        return;
+                      }
+                  }
+                } else {
+                    const dist = Math.hypot(bullet.x - player1.x, bullet.y - player1.y);
+                    if (dist < bullet.radius + player1.radius) {
+                      bullets.splice(index, 1);
+                      players[player1.id].health -= data.damage;
+                      if (players[player1.id].health < 0) players[player1.id].health = 0;
+                        await io.to(players[player1.id]).emit('playerHit', { damage: data.damage });
+                        await io.to(players[player2.id]).emit('opponentHealth', { health: players[player1.id].health });
+                        if (players[player1.id].health <= 0) {
+                          await io.to(players[player2.id]).emit('gameOver', { result: 'win' });
+                          console.log("Vittoria di", players[player2.id]);
+                          await db.add(`${players[player2.id].name}`, 100);
+                          await io.to(players[player1.id]).emit('gameOver', { result: 'lose' });
+              players[player2.id].health = 120;
+              players[player1.id].health = 120;
+              return;
+            }
+          }
         }
-      } catch (error) {
-        console.error('Errore nel joinLobby:', error);
-      }
+    }); 
+    }, 0);
+    };
+
+    }
+    } catch (error) {
+    console.error('Errore nel joinLobby:', error);
+    }
     });
 
     socket.on('playerMove', async (data) => {
       try {
         const opponentId = players[socket.id]?.opponent;
         if (opponentId) {
+          players[socket.id].x = data.x;
+          players[socket.id].y = data.y;
           io.to(opponentId).emit('playerMove', { id: socket.id, x: data.x, y: data.y });
         }
       } catch (error) {
@@ -62,6 +115,8 @@ io.on('connection', async (socket) => {
       try {
         const opponentId = players[socket.id]?.opponent;
         if (opponentId) {
+          players[opponentId].bullets.push(data);
+          players[socket.id].bullets.push(data);
           io.to(opponentId).emit('shoot', data);
         }
       } catch (error) {
