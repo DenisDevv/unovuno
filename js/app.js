@@ -39,38 +39,11 @@ const opponent = {
 };
 const cheaters = ["denis"];
 const bullets = [];
-const obstacles = [
-  { x: 300, y: 200, width: 50, height: 100 },
-  { x: 500, y: 300, width: 150, height: 50 },
-  { x: 700, y: 400, width: 50, height: 150 },
-  { x: 900, y: 500, width: 100, height: 50 },
-  { x: 1100, y: 600, width: 50, height: 100 },
-  { x: 1300, y: 700, width: 120, height: 50 },
-  { x: 1500, y: 800, width: 50, height: 120 },
-  { x: 1700, y: 900, width: 100, height: 50 },
-  { x: 1900, y: 1000, width: 50, height: 100 },
-  { x: 200, y: 1100, width: 150, height: 50 },
-  { x: 400, y: 1200, width: 50, height: 150 },
-  { x: 600, y: 1300, width: 100, height: 50 },
-  { x: 800, y: 1400, width: 50, height: 100 },
-  { x: 1000, y: 1500, width: 150, height: 50 },
-  { x: 300, y: 100, width: 50, height: 100 },
-  { x: 500, y: 200, width: 150, height: 50 },
-  { x: 700, y: 300, width: 50, height: 150 },
-  { x: 900, y: 400, width: 100, height: 50 },
-  { x: 1100, y: 500, width: 50, height: 100 },
-  { x: 1300, y: 600, width: 120, height: 50 },
-  { x: 1500, y: 700, width: 50, height: 120 },
-  { x: 1700, y: 800, width: 100, height: 50 },
-  { x: 1900, y: 900, width: 50, height: 100 },
-  { x: 200, y: 1000, width: 150, height: 50 },
-  { x: 400, y: 100, width: 50, height: 150 },
-  { x: 600, y: 200, width: 100, height: 50 },
-  { x: 800, y: 800, width: 50, height: 100 },
-  { x: 1000, y: 300, width: 150, height: 50 },
-  { x: 1200, y: 500, width: 50, height: 100 },
-  { x: 1400, y:1700, width: 150, height: 50 }
-];
+
+// Dynamic obstacles based on current map
+let obstacles = [];
+let currentMapName = 'classic';
+let availableMaps = [];
 
 const keys = {};
 
@@ -227,6 +200,38 @@ function updateBullets() {
     ctx.closePath();
   });
 }
+
+// Function to load map obstacles
+function loadMap(mapName) {
+  if (window.GameMaps && window.GameMaps.getMap) {
+    const mapData = window.GameMaps.getMap(mapName);
+    obstacles = mapData.obstacles;
+    currentMapName = mapName;
+    console.log('Loaded map:', mapName, 'with', obstacles.length, 'obstacles');
+  }
+}
+
+// Function to create map selector UI
+function createMapSelector(maps, currentMap) {
+  const mapSelector = document.createElement('div');
+  mapSelector.id = 'mapSelector';
+  mapSelector.innerHTML = `
+    <h3>Seleziona Foldspace:</h3>
+    <select id="mapSelect">
+      ${maps.map(map => `<option value="${map.id}" ${map.id === currentMap ? 'selected' : ''}>${map.name}</option>`).join('')}
+    </select>
+    <button id="changeMapBtn">Cambia Mappa</button>
+  `;
+  
+  const lobbyUI = document.getElementById('lobbyUI');
+  lobbyUI.appendChild(mapSelector);
+  
+  document.getElementById('changeMapBtn').addEventListener('click', () => {
+    const selectedMap = document.getElementById('mapSelect').value;
+    socket.emit('changeMap', { mapName: selectedMap });
+  });
+}
+
 socket.on("connected", (data) => {
   if (data && data.leaderboard) {
     const leaderboardData = data.leaderboard;
@@ -242,6 +247,18 @@ socket.on("connected", (data) => {
     document.getElementById("leaderboard").children[2].classList.add("emerald");
   } else {
     console.error('La leaderboard è invalida');
+  }
+  
+  // Handle maps data
+  if (data && data.maps && data.currentMap) {
+    availableMaps = data.maps;
+    currentMapName = data.currentMap;
+    
+    // Load the current map obstacles
+    loadMap(currentMapName);
+    
+    // Create map selector
+    createMapSelector(availableMaps, currentMapName);
   }
 });
 socket.on('playerMove', (data) => {
@@ -366,12 +383,33 @@ function update() {
   drawHUD();
   requestAnimationFrame(update);
 }
+
+socket.on('mapChanged', (data) => {
+  if (data.map) {
+    currentMapName = data.map;
+    loadMap(currentMapName);
+    console.log('Map changed to:', currentMapName);
+    
+    // Update the selector if it exists
+    const mapSelect = document.getElementById('mapSelect');
+    if (mapSelect) {
+      mapSelect.value = currentMapName;
+    }
+  }
+});
+
 socket.on('matchFound', (data) => {
   console.log('Match found:', data);
   document.getElementById("matchmakingStatus").innerHTML = "In coda 2/2...";
   document.getElementById("matchmakingStatus").style.display = 'none';
   opponent.id = data.opponent;
   opponent.name = data.opponentName || 'Sconosciuto';
+  
+  // Load the match map if provided
+  if (data.map) {
+    loadMap(data.map);
+  }
+  
   socket.emit('spawn');
 });
 socket.on('healthUpdated', (data) => {
