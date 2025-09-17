@@ -1,6 +1,7 @@
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
+const { getMap, getAllMaps, DEFAULT_MAP } = require('./js/maps.js');
 
 const app = express();
 const server = http.createServer(app);
@@ -10,10 +11,7 @@ const db = new QuickDB();
 app.use(express.static('./'));
 
 let lobby = [];
-const spawnPoints = [
-  { x: 100, y: 100 },
-  { x: 1720, y: 780 },
-];
+let currentMap = DEFAULT_MAP; // Track current map
 
 const players = {};
 
@@ -25,7 +23,21 @@ io.on('connection', async (socket) => {
       leaderboard = [];
     }
     console.log('Leaderboard data:', leaderboard);
-    await socket.emit('connected', { leaderboard });
+    const availableMaps = getAllMaps();
+    await socket.emit('connected', { leaderboard, maps: availableMaps, currentMap });
+    
+    socket.on('changeMap', async (data) => {
+      try {
+        if (data.mapName && getMap(data.mapName)) {
+          currentMap = data.mapName;
+          console.log('Map changed to:', currentMap);
+          io.emit('mapChanged', { map: currentMap });
+        }
+      } catch (error) {
+        console.error('Error changing map:', error);
+      }
+    });
+    
     socket.on('joinLobby', async (playerData) => {
       try {
         lobby.push({ id: socket.id, name: playerData.name });
@@ -33,12 +45,16 @@ io.on('connection', async (socket) => {
         if (lobby.length >= 2) {
           const player1 = lobby.shift();
           const player2 = lobby.shift();
-          const spawn1 = spawnPoints[0];
-          const spawn2 = spawnPoints[1];
-          players[player1.id] = { health: 120, opponent: player2.id, name: player1.name, x:0, y:0, bullets: []};
-          players[player2.id] = { health: 120, opponent: player1.id, name: player2.name, x:0, y:0, bullets: []};
-          io.to(player1.id).emit('matchFound', { opponent: player2.id, opponentName: player2.name });
-          io.to(player2.id).emit('matchFound', { opponent: player1.id, opponentName: player1.name });
+          
+          // Get current map data
+          const mapData = getMap(currentMap);
+          const spawn1 = mapData.spawnPoints[0];
+          const spawn2 = mapData.spawnPoints[1];
+          
+          players[player1.id] = { health: 120, opponent: player2.id, name: player1.name, x:0, y:0, bullets: [], map: currentMap};
+          players[player2.id] = { health: 120, opponent: player1.id, name: player2.name, x:0, y:0, bullets: [], map: currentMap};
+          io.to(player1.id).emit('matchFound', { opponent: player2.id, opponentName: player2.name, map: currentMap });
+          io.to(player2.id).emit('matchFound', { opponent: player1.id, opponentName: player1.name, map: currentMap });
           io.to(player1.id).emit('spawn', spawn1);
           io.to(player2.id).emit('spawn', spawn2);
           loop();
